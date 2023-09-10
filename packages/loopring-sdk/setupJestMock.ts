@@ -18,7 +18,10 @@ jest.mock('./src/lib/bridge/instantiateWasm', () => {
       const fs = require('fs');
       const path = require('path');
       const wasmBuffer = fs.readFileSync(
-        path.resolve(__dirname, './src/lib/bridge/wasm-release.wasm')
+        path.resolve(
+          __dirname,
+          '../../dist/packages/loopring-wasm/wasm-release.wasm'
+        )
       );
       const obj = await WebAssembly.instantiate(wasmBuffer, go.importObject);
 

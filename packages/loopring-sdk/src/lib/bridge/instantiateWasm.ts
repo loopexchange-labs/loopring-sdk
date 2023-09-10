@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
 // @ts-nocheck
-import wasmfile from './wasm-release.wasm?url';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import wasmfile from '../../../../../dist/packages/loopring-wasm/wasm-release.wasm?url';
 
 export default async function (go: any) {
   let wasm;
