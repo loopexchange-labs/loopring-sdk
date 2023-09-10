@@ -11,7 +11,7 @@
       "options": {
         "outputPath": "dist/packages/loopring-sdk"
       },
-      "dependsOn": [{ "dependencies": true, "target": "wasm" }]
+      "dependsOn": [{ "dependencies": true, "target": "build" }]
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs loopring-sdk {args.ver} {args.tag}",
