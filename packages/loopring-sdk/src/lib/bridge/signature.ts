@@ -116,7 +116,7 @@ export const signRequest = async (
   return signRequestBridge(privateKey, method, baseUrl, path, data);
 };
 
-export const makeRequestParamStr = (request: Map<string, string>) => {
+export const makeRequestParamStr = (request: Map<string, string | number>) => {
   const arrObj = Array.from(request);
   arrObj.sort(function (a, b) {
     return a[0].localeCompare(b[0]);
