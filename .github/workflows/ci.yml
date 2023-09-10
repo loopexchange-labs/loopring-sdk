@@ -33,6 +33,12 @@ jobs:
         run: |
           echo "export PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_ENV
 
+      - name: Setup TinyGo
+        run: |
+          cd $(mktemp -d)
+          wget https://github.com/tinygo-org/tinygo/releases/download/v0.29.0/tinygo_0.29.0_amd64.deb
+          sudo dpkg -i tinygo_0.29.0_amd64.deb
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
