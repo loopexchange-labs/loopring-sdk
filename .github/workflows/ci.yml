@@ -30,6 +30,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version-file: 'packages/loopring-wasm/go.mod'
+          go-version: '1.20'
 
       - name: Add GOPATH/bin to path
         run: |
@@ -38,8 +39,8 @@ jobs:
       - name: Setup TinyGo
         run: |
           cd $(mktemp -d)
-          wget https://github.com/tinygo-org/tinygo/releases/download/v0.29.0/tinygo_0.29.0_amd64.deb
-          sudo dpkg -i tinygo_0.29.0_amd64.deb
+          wget https://github.com/tinygo-org/tinygo/releases/download/v0.28.1/tinygo_0.29.0_amd64.deb
+          sudo dpkg -i tinygo_0.28.1_amd64.deb
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
