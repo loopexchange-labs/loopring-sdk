@@ -7,12 +7,11 @@
   "targets": {
     "wasm": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/dist/packages/loopring-wasm/**/*.{wasm}"],
       "options": {
         "cwd": "packages/loopring-wasm",
         "commands": [
           {
-            "command": "mkdir -p ../../dist/packages/loopring-wasm && tinygo build --no-debug -o ../../dist/packages/loopring-wasm/wasm-release.wasm -target wasm",
+            "command": "tinygo build --no-debug -o ../loopring-sdk/src/lib/bridge/wasm-release.wasm -target wasm",
             "forwardAllArgs": false
           }
         ]

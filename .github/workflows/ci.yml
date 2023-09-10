@@ -28,6 +28,8 @@ jobs:
 
       - name: Setup Go environment
         uses: actions/setup-go@v4
+        with:
+          go-version-file: 'packages/loopring-wasm/go.mod'
 
       - name: Add GOPATH/bin to path
         run: |
