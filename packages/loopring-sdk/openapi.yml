@@ -1,0 +1,1048 @@
+openapi: '3.0.2'
+info:
+  title: SDK for Loopring Layer 2
+  version: '1.0'
+paths:
+  /api/v3/counterFactualInfo:
+    get:
+      operationId: getCounterFactualInfo
+      summary: Counterfactual Wallet Info
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: Account ID
+          required: true
+      responses:
+        '200':
+          description: Returns the counterfactual wallet info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounterfactualWalletInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/user/nft/offchainFee:
+    get:
+      operationId: getNFTOffchainFee
+      summary: GET NFT Offchain Fee
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: Account ID
+          required: true
+        - in: query
+          name: requestType
+          schema:
+            type: integer
+            enum: [9, 10, 11, 13, 19]
+          description: Off-chain request type Allowable ['9:NFT_MINT', '10:NFT_WITHDRAWAL', '11:NFT_TRANSFER', '13:DEPLOY_TOKENADDRESS', '19:NFT_TRANSFER_AND_UPDATE_ACCOUNT']
+          required: true
+        - in: query
+          name: tokenAddress
+          schema:
+            type: string
+          description: (Optional) the NFT tokenAddress, needed when requestType is 9 or 10
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Returns the fee amount
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffchainFeeInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/storageId:
+    get:
+      operationId: getNextStorageId
+      summary: Storage Id
+      description: Fetches the next order id for a given sold token. If the need arises to repeatedly place orders in a short span of time, the order id can be initially fetched through the API and then managed locally. Each new order id can be derived from adding 2 to the last one.
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: Loopring account identifier
+          required: true
+        - in: query
+          name: sellTokenId
+          schema:
+            type: integer
+          description: The unique identifier of the token which the user wants to sell in the next order.
+          required: true
+        - in: query
+          name: maxNext
+          schema:
+            type: boolean
+          description: (Optional) Return the max of the next available storageId, so any storageId > returned value is available, to help users manage storageId by themselves. for example, if [20, 60, 100] is available, all other ids < 100 are used before, the user gets 20 if the flag is false (and 60 in the next run), but gets 100 if the flag is true, so he can use 102, 104 freely.
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Returns the next storage id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NextStorageIdInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/nft/mint:
+    post:
+      operationId: submitNFTMint
+      summary: Mint NFT
+      description: mint nft in Loopring layer2, only can mint ERC1155 in layer2 now.
+      parameters:
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NFTMintRequestV3'
+      responses:
+        '200':
+          description: Mint NFT Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxHashInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/user/nft/balances:
+    get:
+      operationId: getUserNftBalances
+      summary: Get users NFT balance, besides amount, it also includes tokenId and nftData
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: Account ID
+          required: true
+        - in: query
+          name: nftDatas
+          schema:
+            type: string
+          description: (Optional) The Loopring's NFT token data identifier which is a hash string of NFT token address and NFT_ID, separated by ","
+        - in: query
+          name: tokenAddrs
+          schema:
+            type: string
+          description: (Optional) NFT token address, separated by ","
+        - in: query
+          name: tokenIds
+          schema:
+            type: string
+          description: (Optional) The token slot ID in loopring DEX, separated by ","
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: (Optional) Number of records to skip
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 50
+          description: (Optional) Number of records to return. Default is 20, max is 50.
+        - in: query
+          name: nonZero
+          schema:
+            type: boolean
+          description: (Optional) Hide 0 balance NFT token, default is true.
+        - in: query
+          name: metadata
+          schema:
+            type: boolean
+          description: (Optional) Include metadata, default is false.
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Returns the users NFT balances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNftBalancesInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/lockAssets:
+    post:
+      operationId: lockAsset
+      summary: Lock Asset
+      description: Lock Asset.
+      parameters:
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-API-SIG
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LockAssetRequest'
+      responses:
+        '200':
+          description: Lock Asset Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockAssetResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/unlockAssets:
+    post:
+      operationId: unlockAsset
+      summary: Unlock Asset
+      description: Unlock Asset.
+      parameters:
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-API-SIG
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnlockAssetRequest'
+      responses:
+        '200':
+          description: Lock Asset Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockAssetResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/v3/nft/trade:
+    post:
+      operationId: tradeNft
+      summary: Trade NFT
+      description: Trade NFT.
+      parameters:
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-API-SIG
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeNftRequest'
+      responses:
+        '200':
+          description: Trade NFT Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeNftResponse'
+  /api/v3/account:
+    get:
+      operationId: getAccount
+      summary: Get Account info
+      description: One of owner and accountId is required.
+      parameters:
+        - in: query
+          name: owner
+          schema:
+            type: string
+          description: Ethereum address, either owner or accountId should be presented.
+          required: false
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: AccountID, if owner is presented, it must be aligned with the owners accountId, otherwise an error occurs.
+          required: false
+      responses:
+        '200':
+          description: Returns the account info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountInfo'
+  /api/v3/apiKey:
+    get:
+      operationId: getUserApiKey
+      summary: Get the ApiKey associated with the user's account
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: integer
+          description: Account ID
+          required: true
+        - in: header
+          name: X-API-SIG
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Returns the user's ApiKey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserApiKey'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+  /api/wallet/v3/resolveName:
+    get:
+      operationId: resolveName
+      summary: Resolve address to loopring ENS name
+      parameters:
+        - in: query
+          name: owner
+          schema:
+            type: string
+          description: Ethereum address.
+          required: true
+      responses:
+        '200':
+          description: Resolved name info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveNameInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
+components:
+  schemas:
+    ResultInfo:
+      type: object
+      properties:
+        ResultInfo:
+          type: object
+          properties:
+            code:
+              type: number
+            msg:
+              type: string
+            message:
+              type: string
+    TokenAmountInfo:
+      type: object
+      properties:
+        tokenId:
+          type: string
+          description: The Loopring's ERC20 token identifier.
+        amount:
+          type: string
+          description: The amount of the ERC20 token
+      required:
+        - tokenId
+        - amount
+    TokenFeeInfo:
+      type: object
+      properties:
+        token:
+          type: string
+          description: fee token
+        fee:
+          type: string
+          description: fee amount
+        discount:
+          type: number
+          description: token discount. 0.8 means 80% of the fee
+      required:
+        - token
+        - fee
+    CounterfactualWalletInfo:
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: accountId
+        wallet:
+          type: string
+          description: wallet
+        walletFactory:
+          type: string
+          description: walletFactory
+        walletSalt:
+          type: string
+          description: walletSalt
+        walletOwner:
+          type: string
+          description: walletOwner
+      required:
+        - accountId
+        - wallet
+        - walletFactory
+        - walletSalt
+        - walletOwner
+    OffchainFeeInfo:
+      type: object
+      properties:
+        gasPrice:
+          type: string
+          description: gasPrice when calculating the fee
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenFeeInfo'
+      required:
+        - gasPrice
+        - fees
+    NextStorageIdInfo:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          description: Next storage ID for order request, must be even
+        offchainId:
+          type: integer
+          description: Next storage ID for off-chain requests, i.e., transfer/withdraw/updateAccount, must be odd
+      required:
+        - orderId
+        - offchainId
+    TxHashInfo:
+      type: object
+      properties:
+        hash:
+          type: string
+          description: The hash identifier set by the user at the time of submission, can use this hash to get the transfer info
+    NFTMintRequestV3:
+      type: object
+      properties:
+        exchange:
+          type: string
+          description: Exchange address
+        minterAddress:
+          type: string
+          description: minter address
+        minterId:
+          type: integer
+          description: minter accountID
+        toAddress:
+          type: string
+          description: to address
+        toAccountId:
+          type: integer
+          description: to accountId
+        nftType:
+          type: integer
+          enum: [0, 1]
+          description: 0 for ERC1155, 1 for ERC721, now only support ERC1155
+        tokenAddress:
+          type: string
+          description: tokenAddress
+        nftId:
+          type: string
+          description: nftId
+        amount:
+          type: string
+          description: how many tokens to mint
+        royaltyPercentage:
+          type: integer
+          minimum: 0
+          maximum: 10
+          description: fee to the creator of each NFT transaction. 1 ~ 10, percentage
+        maxFee:
+          $ref: '#/components/schemas/TokenAmountInfo'
+        storageId:
+          type: integer
+          description: the offchain id of fee token
+        validUntil:
+          type: integer
+          format: int64
+          description: Timestamp for transfer to become invalid, seconds
+        eddsaSignature:
+          type: string
+          description: eddsa signature of the eddsa hash
+      required:
+        - exchange
+        - minterAddress
+        - minterId
+        - toAddress
+        - toAccountId
+        - nftType
+        - tokenAddress
+        - nftId
+        - amount
+        - royaltyPercentage
+        - maxFee
+        - storageId
+        - validUntil
+        - eddsaSignature
+    UserNftBalancesInfo:
+      type: object
+      properties:
+        totalNum:
+          type: integer
+          description: Total number
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CombinedBalance'
+      required:
+        - totalNum
+        - data
+    PendingBalance:
+      type: object
+      properties:
+        withdraw:
+          type: string
+          description: Withdrawal pending balance which means the token is in withdrawal state but not arrived L1
+        deposit:
+          type: string
+          description: Deposit pending balance which means the token is in deposit state but not arrived L2
+      required:
+        - withdraw
+        - deposit
+    MetadataImageSize:
+      properties:
+        240-240:
+          type: string
+          description: 240x240
+        332-332:
+          type: string
+          description: 332x332
+        original:
+          type: string
+          description: Original
+      required:
+        - 240-240
+        - 332-332
+        - original
+    MetadataExtra:
+      properties:
+        imageData:
+          type: string
+          description: ImageData
+        externalUrl:
+          type: string
+          description: ExternalUrl
+        attributes:
+          type: string
+          description: Attributes
+        backgroundColor:
+          type: string
+          description: BackgroundColor
+        animationUrl:
+          type: string
+          description: AnimationUrl
+        youtubeUrl:
+          type: string
+          description: YoutubeUrl
+        minter:
+          type: string
+          description: Minter
+      required:
+        - imageData
+        - externalUrl
+        - attributes
+        - backgroundColor
+        - animationUrl
+        - youtubeUrl
+        - minter
+    MetadataBase:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name
+        decimals:
+          type: integer
+          description: Decimals
+        description:
+          type: string
+          description: Description
+        image:
+          type: string
+          description: Image
+        properties:
+          type: string
+          description: Properties
+        localization:
+          type: string
+          description: Localization
+      required:
+        - name
+        - decimals
+        - description
+        - image
+        - properties
+        - localization
+    Metadata:
+      type: object
+      properties:
+        uri:
+          type: string
+          description: IPFS uri
+        tokenAddress:
+          type: string
+          description: Token Address
+        network:
+          type: integer
+          enum:
+            - 0
+          description: Network
+        status:
+          type: integer
+          description: Status
+        nftType:
+          type: integer
+          enum:
+            - 0
+            - 1
+          description: NFT Type
+        nftId:
+          type: string
+          description: Nft ID
+        base:
+          $ref: '#/components/schemas/MetadataBase'
+        extra:
+          $ref: '#/components/schemas/MetadataExtra'
+        imageSize:
+          $ref: '#/components/schemas/MetadataImageSize'
+      required:
+        - uri
+        - tokenAddress
+        - network
+        - nftType
+        - base
+        - status
+    CombinedBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID
+        accountId:
+          type: integer
+          description: AccountID
+        tokenId:
+          type: integer
+          description: tokenId
+        nftData:
+          type: string
+          description: (Optional) Users NFT token nftData
+        tokenAddress:
+          type: string
+          description: (Optional) token address
+        nftType:
+          type: string
+          description: nft type
+          enum:
+            - ERC1155
+            - ERC721
+        nftId:
+          type: string
+          description: (Optional) nft id
+        total:
+          type: string
+          description: total amount
+        locked:
+          type: string
+          description: frozen amount
+        pending:
+          $ref: '#/components/schemas/PendingBalance'
+          description: pending balance
+        isCounterFactualNFT:
+          type: boolean
+          description: is counterFactual NFT or not
+        minter:
+          type: string
+          description: minter of nft
+        royaltyPercentage:
+          type: integer
+          description: royalty percentage
+        deploymentStatus:
+          type: string
+          enum:
+            - NOT_DEPLOYED
+            - DEPLOYING
+            - DEPLOYED
+          description: tokenAddress deploy status
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+          description: (Optional) only if metadata query parameter is true
+      required:
+        - id
+        - accountId
+        - tokenId
+        - nftType
+        - total
+        - locked
+        - pending
+        - isCounterFactualNFT
+        - deploymentStatus
+        - minter
+        - royaltyPercentage
+        - tokenAddress
+        - nftId
+        - nftData
+    LockAssetResponse:
+      type: object
+      properties:
+        hash:
+          type: string
+          description: The hash identifier set by the user at the time of submission, can use this hash to get info
+        isIdempotent:
+          type: boolean
+          description: isIdempotent
+    LockAssetRequest:
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: accountId
+        eddsaSignature:
+          type: string
+          description: eddsa signature of the eddsa hash
+        exchange:
+          type: string
+          description: Exchange address
+        lockedUntil:
+          type: integer
+          description: lockedUntil
+          example: 1659864282
+        tag:
+          type: string
+          description: Tag
+          example: Test-Lock-1657272282062
+        timestamp:
+          type: integer
+          description: timestamp
+          example: 1657272282
+        token:
+          type: object
+          properties:
+            tokenId:
+              type: integer
+            volume:
+              type: string
+          required:
+            - tokenId
+            - volume
+      required:
+        - eddsaSignature
+        - accountId
+        - exchange
+        - timestamp
+        - lockedUntil
+        - token
+        - tag
+    UnlockAssetRequest:
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: accountId
+        hash:
+          type: string
+          description: the lock hash returned from lockAsset
+      required:
+        - accountId
+        - hash
+    NftOrderNftToken:
+      type: object
+      properties:
+        tokenId:
+          type: integer
+          description: the Loopring's NFT token identifier
+        nftData:
+          type: string
+          description: the Loopring's NFT token data identifier which is a hash string of NFT token address and NFT_ID
+        amount:
+          type: string
+          description: the amount of the NFT token
+      required:
+        - tokenId
+        - amount
+    NftOrderErc20Token:
+      type: object
+      properties:
+        tokenId:
+          type: integer
+          description: the Loopring's erc20 token identifier
+        amount:
+          type: string
+          description: the amount of the erc20 token
+      required:
+        - tokenId
+        - amount
+    NftMakerOrder:
+      type: object
+      properties:
+        exchange:
+          type: string
+          description: exchangeAddress in exchange info
+        accountId:
+          type: integer
+          description: accountId
+        storageId:
+          type: integer
+          description: storageId
+        sellToken:
+          $ref: '#/components/schemas/NftOrderNftToken'
+          description: nft token
+        buyToken:
+          $ref: '#/components/schemas/NftOrderErc20Token'
+          description: erc20 token
+        allOrNone:
+          type: boolean
+          description: allOrNone
+        fillAmountBOrS:
+          type: boolean
+          description: fillAmountBOrS
+        validUntil:
+          type: integer
+          format: int64
+          description: timestamp for transfer to become invalid, seconds
+        maxFeeBips:
+          type: integer
+          description: maximum order fee that the user can accept, value range (in ten thousandths) 1 ~ 5000
+        eddsaSignature:
+          type: string
+          description: eddsa signature of the eddsa hash
+        taker:
+          type: string
+          description: taker address
+      required:
+        - exchange
+        - accountId
+        - storageId
+        - sellToken
+        - buyToken
+        - allOrNone
+        - fillAmountBOrS
+        - validUntil
+        - maxFeeBips
+        - eddsaSignature
+    NftTakerOrder:
+      type: object
+      properties:
+        exchange:
+          type: string
+          description: exchangeAddress in exchange info
+        accountId:
+          type: integer
+          description: accountId
+        storageId:
+          type: integer
+          description: storageId
+        sellToken:
+          $ref: '#/components/schemas/NftOrderErc20Token'
+          description: erc20 token
+        buyToken:
+          $ref: '#/components/schemas/NftOrderNftToken'
+          description: nft token
+        allOrNone:
+          type: boolean
+          description: allOrNone
+        fillAmountBOrS:
+          type: boolean
+          description: fillAmountBOrS
+        validUntil:
+          type: integer
+          format: int64
+          description: timestamp for transfer to become invalid, seconds
+        maxFeeBips:
+          type: integer
+          description: maximum order fee that the user can accept, value range (in ten thousandths) 1 ~ 5000
+        eddsaSignature:
+          type: string
+          description: eddsa signature of the eddsa hash
+        taker:
+          type: string
+          description: taker address
+      required:
+        - exchange
+        - accountId
+        - storageId
+        - sellToken
+        - buyToken
+        - allOrNone
+        - fillAmountBOrS
+        - validUntil
+        - maxFeeBips
+        - eddsaSignature
+    TradeNftRequest:
+      type: object
+      properties:
+        maker:
+          $ref: '#/components/schemas/NftMakerOrder'
+          description: maker order
+        makerFeeBips:
+          type: integer
+          description: maker fee bips
+        taker:
+          $ref: '#/components/schemas/NftTakerOrder'
+          description: taker order
+        takerFeeBips:
+          type: integer
+          description: taker fee bips
+      required:
+        - maker
+        - makerFeeBips
+        - taker
+        - takerFeeBips
+    NftTradeFill:
+      type: object
+      properties:
+        orderHash:
+          type: string
+          description: the order hash
+        sellFilled:
+          type: object
+          description: the orders sell fill
+        buyFilled:
+          type: object
+          description: the orders buy fill
+        fee:
+          type: object
+          description: the orders fee
+    TradeNftResponse:
+      type: object
+      properties:
+        makerFills:
+          $ref: '#/components/schemas/NftTradeFill'
+          description: maker fills
+        takerFills:
+          $ref: '#/components/schemas/NftTradeFill'
+          description: taker fills
+        tradeHash:
+          type: string
+          description: the trade hash which can be queried in loopring scan web
+    AccountInfo:
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: Account ID
+        owner:
+          type: string
+          description: Ethereum address
+        frozen:
+          type: boolean
+          description: The frozen state of the account, true stands for frozen, if the account is frozen, the user cannot submit an order.
+        publicKey:
+          $ref: '#/components/schemas/PublicKey'
+          description: The user's public key
+        tags:
+          type: string
+          description: Comma separated list of tags such as VIP levels, etc
+        nonce:
+          type: integer
+          description: nonce
+        keyNonce:
+          type: integer
+          description: Nonce of users key change request, for backward compatible
+        keySeed:
+          type: string
+          description: KeySeed of users L2 eddsaKey, the L2 key should be generated from this seed, i.e., L2_EDDSA_KEY=eth.sign(keySeed). Otherwise, users may receive an error when logging into the Loopring DEX
+      required:
+        - accountId
+        - owner
+        - frozen
+        - publicKey
+        - nonce
+        - keyNonce
+        - keySeed
+    PublicKey:
+      type: object
+      properties:
+        x:
+          type: string
+          description: The public keys x part.
+        y:
+          type: string
+          description: The public keys y part.
+      required:
+        - x
+        - y
+    UserApiKey:
+      type: object
+      properties:
+        apiKey:
+          type: string
+          description: ApiKey
+      required:
+        - apiKey
+    ResolveNameInfo:
+      type: object
+      properties:
+        data:
+          type: string
+          description: Resolved name or empty string
+      required:
+        - data

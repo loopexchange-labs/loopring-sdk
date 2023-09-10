@@ -1,0 +1,8 @@
+github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
+github.com/leppaludi/loopring-sig v0.0.0-20230131191428-8eb9916bfe31 h1:tEfYKFl8sYzfe3c2jhezPE//1KjXbsqp6hgKVomYghw=
+github.com/leppaludi/loopring-sig v0.0.0-20230131191428-8eb9916bfe31/go.mod h1:M1u/Cq6wJNeMQUuZCVU/1YZ2zwkfsaPpB7sxRSRzgQE=
+github.com/loopexchange-labs/go-loopring-sig v0.0.0-20230816231954-06add9013afa h1:pGpSUCVWh+zYqUrQxSSj487GfXP/8LDMbVNGfFIYF3k=
+github.com/loopexchange-labs/go-loopring-sig v0.0.0-20230816231954-06add9013afa/go.mod h1:r/OyK4TCoWGfBJ+kXChmk1jrt8ncsMlncT7nEatdf90=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/stretchr/testify v1.7.2 h1:4jaiDzPyXQvSd7D0EjG45355tLlV3VOECpq10pLC+8s=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
