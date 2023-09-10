@@ -11,6 +11,9 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -59,7 +62,7 @@ jobs:
       - run: pnpm exec nx test loopring-sdk --ci --code-coverage
       - run: pnpm exec nx build loopring-sdk
 
-      - run: pnpm exec nx publish loopring-sdk --ver ${{ github.event.release.tag_name }}
+      - run: pnpm exec nx publish loopring-sdk --ver ${{ github.event.release.tag_name }} --tag latest
         if: github.event_name == 'release'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

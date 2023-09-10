@@ -3,12 +3,26 @@ import { defineConfig } from 'vite';
 
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import dts from 'vite-plugin-dts';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import * as path from 'path';
 
 export default defineConfig({
   cacheDir: '../../node_modules/.vite/loopring-sdk',
 
   plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'LICENSE',
+          dest: '',
+        },
+        {
+          src: 'README.md',
+          dest: '',
+        },
+      ],
+    }),
+
     dts({
       entryRoot: 'src',
       tsConfigFilePath: path.join(__dirname, 'tsconfig.lib.json'),

@@ -33,6 +33,7 @@
     "verdaccio": "^5.26.2",
     "vite": "~4.3.9",
     "vite-plugin-dts": "~2.3.0",
+    "vite-plugin-static-copy": "^0.17.0",
     "whatwg-fetch": "^3.6.18"
   },
   "nx": {
