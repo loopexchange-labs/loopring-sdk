@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'pnpm'
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4
+
+      - name: Add GOPATH/bin to path
+        run: |
+          echo "export PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec nx format:check
+      - run: pnpm exec nx affected --target=lint --parallel=3
+      - run: pnpm exec nx affected --target=tsc --parallel=3
+      - run: pnpm exec nx affected --target=test --parallel=3 --ci --code-coverage
+      - run: pnpm exec nx affected --target build --parallel=3
