@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+  release:
+    types: [published]
 
 jobs:
   main:
@@ -59,3 +61,8 @@ jobs:
       - run: pnpm exec nx tsc loopring-sdk
       - run: pnpm exec nx test loopring-sdk --ci --code-coverage
       - run: pnpm exec nx build loopring-sdk
+
+      - run: pnpm exec nx publish loopring-sdk --ver ${{ github.event.release.tag_name }}
+        if: github.event_name == 'release'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
