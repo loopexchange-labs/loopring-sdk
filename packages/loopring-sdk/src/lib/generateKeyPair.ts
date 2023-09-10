@@ -1,18 +1,11 @@
-import type { ChainId } from './loopring';
-import { personalSign } from './personal_sign';
-import { generateKeyPair as generateKeyPairWasm } from './signature';
+import type { ChainId } from './constants';
+import { personalSign } from './personalSign';
+import { generateKeyPair as generateKeyPairWasm } from './bridge/signature';
+import type { VerifyMessage, SignMessageAsync } from './personalSign';
 
 export interface KeyPairParams {
-  signMessageAsync: (args: { message: string }) => Promise<`0x${string}`>;
-  verifyMessage: ({
-    address,
-    message,
-    signature,
-  }: {
-    address: `0x${string}`;
-    message: string;
-    signature: `0x${string}`;
-  }) => Promise<boolean>;
+  signMessageAsync: SignMessageAsync;
+  verifyMessage: VerifyMessage;
   account: `0x${string}`;
   accountId: number;
   keySeed: string;

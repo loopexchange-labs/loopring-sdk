@@ -1,5 +1,5 @@
 export * from './lib/loopring';
-export * from './lib/personal_sign';
-export * from './lib/generate_key_pair';
+export * from './lib/personalSign';
+export * from './lib/generateKeyPair';
 export * from './lib/openapi/models/index';
-export { getEddsaSigNftOrder } from './lib/signature';
+export { getEddsaSigNftOrder } from './lib/bridge/signature';

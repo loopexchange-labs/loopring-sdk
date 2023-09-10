@@ -1,7 +1,10 @@
 {
   "name": "@loopexchange-labs/loopring-sdk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/loopexchange-labs/loopring-sdk.git"
+  },
   "version": "0.0.1",
-  "dependencies": {},
   "main": "./index.js",
   "module": "./index.mjs",
   "typings": "./index.d.ts"

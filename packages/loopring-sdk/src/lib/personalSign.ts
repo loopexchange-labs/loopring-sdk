@@ -1,17 +1,24 @@
-import { LoopringAPI, type ChainId } from './loopring';
+import type { ChainId } from './constants';
+import { LoopringAPI } from './loopring';
 import type { CounterfactualWalletInfo } from './openapi';
 
+export type SignMessageAsync = (args: {
+  message: string;
+}) => Promise<`0x${string}`>;
+
+export type VerifyMessage = ({
+  address,
+  message,
+  signature,
+}: {
+  address: `0x${string}`;
+  message: string;
+  signature: `0x${string}`;
+}) => Promise<boolean>;
+
 export async function personalSign(
-  signMessageAsync: (args: { message: string }) => Promise<`0x${string}`>,
-  verifyMessage: ({
-    address,
-    message,
-    signature,
-  }: {
-    address: `0x${string}`;
-    message: string;
-    signature: `0x${string}`;
-  }) => Promise<boolean>,
+  signMessageAsync: SignMessageAsync,
+  verifyMessage: VerifyMessage,
   account: `0x${string}`,
   accountId: number,
   msg: string,
@@ -47,7 +54,7 @@ export async function personalSign(
     try {
       const counterFactualInfo = await new LoopringAPI(
         chainId
-      ).getCounterFactualInfo({ accountId });
+      ).accountApi.getCounterFactualInfo({ accountId });
 
       if (counterFactualInfo && counterFactualInfo.walletOwner) {
         let _signature = signature;

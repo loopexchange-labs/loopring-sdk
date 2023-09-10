@@ -1,8 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AccountInfo';
+export * from './Cached';
+export * from './Collection';
 export * from './CombinedBalance';
 export * from './CounterfactualWalletInfo';
+export * from './Extra';
+export * from './ExtraProperties';
 export * from './LockAssetRequest';
 export * from './LockAssetRequestToken';
 export * from './LockAssetResponse';
@@ -19,10 +23,12 @@ export * from './NftTakerOrder';
 export * from './NftTradeFill';
 export * from './OffchainFeeInfo';
 export * from './PendingBalance';
+export * from './Preference';
 export * from './PublicKey';
 export * from './ResolveNameInfo';
 export * from './ResultInfo';
 export * from './ResultInfoResultInfo';
+export * from './Times';
 export * from './TokenAmountInfo';
 export * from './TokenFeeInfo';
 export * from './TradeNftRequest';

@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'pnpm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@loopexchange-labs'
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'packages/loopring-wasm/go.mod'
+          cache-dependency-path: 'packages/loopring-wasm/go.sum'
+
+      - name: Add GOPATH/bin to path
+        run: |
+          echo "export PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_ENV
+
+      - name: Setup TinyGo
+        run: |
+          cd $(mktemp -d)
+          wget https://github.com/tinygo-org/tinygo/releases/download/v0.28.1/tinygo_0.28.1_amd64.deb
+          sudo dpkg -i tinygo_0.28.1_amd64.deb
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec nx format:check
+
+      - run: pnpm exec nx lint loopring-wasm
+      - run: pnpm exec nx build loopring-wasm
+
+      - run: pnpm exec nx lint loopring-sdk
+      - run: pnpm exec nx tsc loopring-sdk
+      - run: pnpm exec nx test loopring-sdk --ci --code-coverage
+      - run: pnpm exec nx build loopring-sdk

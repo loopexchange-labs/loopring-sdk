@@ -11,7 +11,7 @@
         "cwd": "packages/loopring-wasm",
         "commands": [
           {
-            "command": "tinygo build --no-debug -o ../loopring-sdk/src/lib/wasm-release.wasm -target wasm",
+            "command": "tinygo build --no-debug -o ../loopring-sdk/src/lib/bridge/wasm-release.wasm -target wasm",
             "forwardAllArgs": false
           }
         ]
@@ -30,5 +30,5 @@
       }
     }
   },
-  "tags": ["scope:backend", "type:go"]
+  "tags": ["type:go"]
 }
