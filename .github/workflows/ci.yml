@@ -11,9 +11,6 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,7 +27,7 @@ jobs:
         with:
           node-version: '18.x'
           cache: 'pnpm'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@loopexchange-labs'
 
       - name: Setup Go environment
@@ -65,4 +62,4 @@ jobs:
       - run: pnpm exec nx publish loopring-sdk --ver ${{ github.event.release.tag_name }}
         if: github.event_name == 'release'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
