@@ -5,8 +5,9 @@
   "sourceRoot": "packages/loopring-wasm",
   "implicitDependencies": [],
   "targets": {
-    "build": {
+    "wasm": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/packages/loopring-wasm/**/*.{wasm}"],
       "options": {
         "cwd": "packages/loopring-wasm",
         "commands": [
