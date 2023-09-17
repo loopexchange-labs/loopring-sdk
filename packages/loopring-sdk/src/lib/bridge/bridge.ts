@@ -10,9 +10,31 @@ declare global {
 import Go from './go';
 import instantiateWasm from './instantiateWasm';
 
-const g = global || window || self;
-if (!g.__go_wasm__) {
-  g.__go_wasm__ = {};
+let globalObject: typeof globalThis;
+
+// Check if globalThis is defined (modern environments)
+if (typeof globalThis !== 'undefined') {
+  globalObject = globalThis;
+}
+// Check if window is defined (browser environment)
+else if (typeof window !== 'undefined') {
+  globalObject = window;
+}
+// Check if self is defined (web workers)
+else if (typeof self !== 'undefined') {
+  globalObject = self;
+}
+// Fallback to global (Node.js environment)
+else if (typeof global !== 'undefined') {
+  globalObject = global;
+} else {
+  throw new Error(
+    'cannot export Go (neither globalThis, global, window nor self is defined)'
+  );
+}
+
+if (!globalObject.__go_wasm__) {
+  globalObject.__go_wasm__ = {};
 }
 
 /**
@@ -25,7 +47,7 @@ const maxTime = 3 * 1000;
 /**
  * bridge is an easier way to refer to the Go WASM object.
  */
-const bridge = g.__go_wasm__;
+const bridge = globalObject.__go_wasm__;
 
 /**
  * Wrapper is used by Go to run all Go functions in JS.
@@ -86,7 +108,7 @@ export default function () {
 
     const wasm = await instantiateWasm(go);
 
-    go.run(wasm, g);
+    go.run(wasm, globalObject);
   }
 
   init();
