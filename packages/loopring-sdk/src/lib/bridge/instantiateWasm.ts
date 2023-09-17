@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
-// @ts-nocheck
+import type { Go, Instance } from './go';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import wasmfile from './wasm-release.wasm?url';
 
-export default async function (go: any) {
+export default async function (go: Go): Promise<Instance> {
   let wasm;
   if ('instantiateStreaming' in WebAssembly) {
     const obj = await WebAssembly.instantiateStreaming(
@@ -16,5 +17,5 @@ export default async function (go: any) {
     wasm = await WebAssembly.instantiate(bytes, go.importObject);
   }
 
-  return wasm;
+  return wasm as Instance;
 }

@@ -1,8 +1,13 @@
-/* eslint-disable prefer-spread, @typescript-eslint/ban-ts-comment, @typescript-eslint/no-var-requires, prefer-const, no-async-promise-executor */
-// @ts-nocheck
+/* eslint-disable prefer-spread, no-async-promise-executor */
+
 // Initially, the __go_wasm__ object will be an empty object.
 
-import './wasm_exec';
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-var
+  var __go_wasm__: any | undefined;
+}
+
+import Go from './go';
 import instantiateWasm from './instantiateWasm';
 
 const g = global || window || self;
@@ -33,8 +38,9 @@ const bridge = g.__go_wasm__;
  *
  * @returns {Function} returns a function that take arguments which are used to call the Go function.
  */
-function wrapper(goFunc) {
-  return (...args) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function wrapper(goFunc: any) {
+  return (...args: unknown[]) => {
     const result = goFunc.apply(undefined, args);
     if (result.error instanceof Error) {
       throw result.error;
@@ -52,7 +58,7 @@ function wrapper(goFunc) {
  * @returns {Promise} an always-resolving promise when a tick has been completed.
  */
 function sleep() {
-  return new Promise((res) => {
+  return new Promise<void>((res) => {
     requestAnimationFrame(() => res());
     setTimeout(() => {
       res();
@@ -71,17 +77,16 @@ function sleep() {
  * If a non-function value is returned however arguments are provided, a warning will be printed.
  */
 export default function () {
-  let proxy;
-  let go;
+  let go: Go;
 
   async function init() {
     bridge.__wrapper__ = wrapper;
 
-    go = new g.Go();
+    go = new Go();
 
     const wasm = await instantiateWasm(go);
 
-    go.run(wasm);
+    go.run(wasm, g);
   }
 
   init();
@@ -93,11 +98,11 @@ export default function () {
     }
   }, maxTime);
 
-  proxy = new Proxy(
+  const proxy = new Proxy(
     {},
     {
       get: (_, key) => {
-        return (...args) => {
+        return (...args: unknown[]) => {
           return new Promise(async (res, rej) => {
             if (!go || go.exited) {
               return rej(new Error('The Go instance is not active.'));
