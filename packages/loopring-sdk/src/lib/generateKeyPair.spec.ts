@@ -16,6 +16,10 @@ describe('generateKeyPair', () => {
         account: '0x2345',
         accountId: 1,
         chainId: 1,
+        publicKey: {
+          x: '0x001b9a7064d6f1b27979170f9a5ce2fa32cefb77e2ac81583404e544943d620948',
+          y: '0x001bb27243185bc780f46f964ad2011d55d0ff3ed0177b62bbe400d88ce9bc8f65',
+        },
       })
     ).resolves.toEqual({
       keyPair: {

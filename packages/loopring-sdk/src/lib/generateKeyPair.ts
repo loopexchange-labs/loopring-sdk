@@ -14,9 +14,9 @@ export interface KeyPairParams {
   // accountId?: number;
 }
 
-// export function hexEqual(hex1: string, hex2: string) {
-//   return hex1.toLowerCase() === hex2.toLowerCase();
-// }
+export function hexEqual(hex1: string, hex2: string) {
+  return BigInt(hex1) === BigInt(hex2);
+}
 
 export async function generateKeyPair({
   signMessageAsync,
@@ -36,23 +36,23 @@ export async function generateKeyPair({
     chainId
   );
 
-  const generatedKeyPair = await generateKeyPairWasm(result.signature);
+  let generatedKeyPair = await generateKeyPairWasm(result.signature);
 
-  // if (
-  //   publicKey &&
-  //   result.signature.length > 3 &&
-  //   publicKey.x &&
-  //   publicKey.y &&
-  //   (!hexEqual(generatedKeyPair.formatedPx, publicKey.x) ||
-  //     !hexEqual(generatedKeyPair.formatedPy, publicKey.y))
-  // ) {
-  //   const value = result.signature.split('');
-  //   let end = value.splice(result.signature.length - 2, 2).join('');
-  //   end = end == '1c' ? '01' : '1c';
-  //   generatedKeyPair = await generateKeyPairWasm(
-  //     value.concat(end.split('')).join('')
-  //   );
-  // }
+  if (
+    publicKey &&
+    result.signature.length > 3 &&
+    publicKey.x &&
+    publicKey.y &&
+    (!hexEqual(generatedKeyPair.formatedPx, publicKey.x) ||
+      !hexEqual(generatedKeyPair.formatedPy, publicKey.y))
+  ) {
+    const value = result.signature.split('');
+    let end = value.splice(result.signature.length - 2, 2).join('');
+    end = end == '1c' ? '01' : '1c';
+    generatedKeyPair = await generateKeyPairWasm(
+      value.concat(end.split('')).join('')
+    );
+  }
 
   return {
     counterFactualInfo: result.counterFactualInfo,
