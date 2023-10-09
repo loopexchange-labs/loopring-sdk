@@ -47,4 +47,49 @@ describe('generateKeyPair', () => {
       { address: '0x2345', message: '0x3456', signature: '0x1234' },
     ]);
   });
+
+  it('generateKeyPair - leading 0s', async () => {
+    const signMessageAsync = jest.fn();
+    const verifyMessage = jest.fn();
+    const signature =
+      '0x00c4fafca785d8b4da5e15265e4e58767a3f2502cdea2fcc4408cee5149e2a697fb7aaba14dceb096abd78cd4e9576859dcef262a4b51f2bb4554ebfd4fb72f5cf02';
+
+    signMessageAsync.mockResolvedValueOnce(signature);
+    verifyMessage.mockResolvedValueOnce(true);
+
+    await expect(
+      generateKeyPair({
+        signMessageAsync,
+        verifyMessage,
+        keySeed: '0x3456',
+        account: '0x2345',
+        accountId: 1,
+        chainId: 1,
+      })
+    ).resolves.toEqual({
+      keyPair: {
+        publicKeyX:
+          '13177128602008476316648007186770414467529839960903001891999762356783519376339',
+        publicKeyY:
+          '12345804151819755343032722751269003874303422211927604135345729794881772258791',
+        secretKey:
+          '110363126876775936939184191137732252584845853294910358210190810231166593026',
+      },
+      formatedPx:
+        '0x1d21fd9096f5e99a270d0692b2e88127669a6980029513b1ca1459bea0e423d3',
+      formatedPy:
+        '0x1b4b7a3ef37cb12bdd53c1dd25e71c032c6a06ab1490dbafc7c304bbbf1305e7',
+      sk: '0x3e769be3e46e6ca29d3b493f3ddfd7b66b18f404f4bd6e9f3d51a791f9e802',
+    });
+
+    expect(signMessageAsync.mock.calls).toHaveLength(1);
+    expect(verifyMessage.mock.calls).toHaveLength(1);
+
+    expect(signMessageAsync.mock.calls[0]).toStrictEqual([
+      { message: '0x3456' },
+    ]);
+    expect(verifyMessage.mock.calls[0]).toStrictEqual([
+      { address: '0x2345', message: '0x3456', signature: signature },
+    ]);
+  });
 });
