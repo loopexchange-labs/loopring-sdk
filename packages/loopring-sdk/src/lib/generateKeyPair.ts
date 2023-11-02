@@ -38,6 +38,19 @@ export async function generateKeyPair({
 
   let generatedKeyPair = await generateKeyPairWasm(result.signature);
 
+  // Missing 02 suffix. Needed when Loopring Wallet doesn't add it.
+  if (
+    publicKey &&
+    result.signature.length === 132 &&
+    publicKey.x &&
+    publicKey.y &&
+    (!hexEqual(generatedKeyPair.formatedPx, publicKey.x) ||
+      !hexEqual(generatedKeyPair.formatedPy, publicKey.y))
+  ) {
+    generatedKeyPair = await generateKeyPairWasm(`${result.signature}02`);
+  }
+
+  // I don't know why this is needed. Ported from the original code.
   if (
     publicKey &&
     result.signature.length > 3 &&
