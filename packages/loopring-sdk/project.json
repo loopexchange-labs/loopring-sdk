@@ -11,14 +11,19 @@
       "options": {
         "outputPath": "dist/packages/loopring-sdk"
       },
-      "dependsOn": [{ "dependencies": true, "target": "build" }]
+      "dependsOn": [
+        {
+          "dependencies": true,
+          "target": "build"
+        }
+      ]
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs loopring-sdk {args.ver} {args.tag}",
       "dependsOn": ["build"]
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
@@ -37,23 +42,21 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/loopring-sdk/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "packages/loopring-sdk/jest.config.ts"
       },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
+      "dependsOn": [
+        {
+          "dependencies": true,
+          "target": "build"
         }
-      },
-      "dependsOn": [{ "dependencies": true, "target": "build" }]
+      ]
     },
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
         "commands": [
           {
-            "command": "pnpm exec openapi-generator-cli generate -i ./packages/loopring-sdk/openapi.yml -g typescript-fetch -o ./packages/loopring-sdk/src/lib/openapi --additional-properties=supportsES6=true,sortModelPropertiesByRequiredFlag=false,sortParamsByRequiredFlag=false"
+            "command": "pnpm exec openapi-generator-cli generate -i packages/loopring-sdk/openapi.yml -g typescript-fetch -o packages/loopring-sdk/src/lib/openapi --additional-properties=supportsES6=true,sortModelPropertiesByRequiredFlag=false,sortParamsByRequiredFlag=false"
           }
         ]
       }

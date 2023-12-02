@@ -4,3 +4,5 @@
 /packages/loopring-sdk/src/lib/openapi
 pnpm-lock.yaml
 .vscode
+
+/.nx/cache

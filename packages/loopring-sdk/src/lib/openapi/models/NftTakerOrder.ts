@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { NftOrderErc20Token } from './NftOrderErc20Token';
+import type { NftTokenAmountInfo } from './NftTokenAmountInfo';
 import {
-    NftOrderErc20TokenFromJSON,
-    NftOrderErc20TokenFromJSONTyped,
-    NftOrderErc20TokenToJSON,
-} from './NftOrderErc20Token';
-import type { NftOrderNftToken } from './NftOrderNftToken';
+    NftTokenAmountInfoFromJSON,
+    NftTokenAmountInfoFromJSONTyped,
+    NftTokenAmountInfoToJSON,
+} from './NftTokenAmountInfo';
+import type { TokenAmountInfo } from './TokenAmountInfo';
 import {
-    NftOrderNftTokenFromJSON,
-    NftOrderNftTokenFromJSONTyped,
-    NftOrderNftTokenToJSON,
-} from './NftOrderNftToken';
+    TokenAmountInfoFromJSON,
+    TokenAmountInfoFromJSONTyped,
+    TokenAmountInfoToJSON,
+} from './TokenAmountInfo';
 
 /**
  * 
@@ -52,16 +52,16 @@ export interface NftTakerOrder {
     storageId: number;
     /**
      * 
-     * @type {NftOrderErc20Token}
+     * @type {TokenAmountInfo}
      * @memberof NftTakerOrder
      */
-    sellToken: NftOrderErc20Token;
+    sellToken: TokenAmountInfo;
     /**
      * 
-     * @type {NftOrderNftToken}
+     * @type {NftTokenAmountInfo}
      * @memberof NftTakerOrder
      */
-    buyToken: NftOrderNftToken;
+    buyToken: NftTokenAmountInfo;
     /**
      * allOrNone
      * @type {boolean}
@@ -132,8 +132,8 @@ export function NftTakerOrderFromJSONTyped(json: any, ignoreDiscriminator: boole
         'exchange': json['exchange'],
         'accountId': json['accountId'],
         'storageId': json['storageId'],
-        'sellToken': NftOrderErc20TokenFromJSON(json['sellToken']),
-        'buyToken': NftOrderNftTokenFromJSON(json['buyToken']),
+        'sellToken': TokenAmountInfoFromJSON(json['sellToken']),
+        'buyToken': NftTokenAmountInfoFromJSON(json['buyToken']),
         'allOrNone': json['allOrNone'],
         'fillAmountBOrS': json['fillAmountBOrS'],
         'validUntil': json['validUntil'],
@@ -155,8 +155,8 @@ export function NftTakerOrderToJSON(value?: NftTakerOrder | null): any {
         'exchange': value.exchange,
         'accountId': value.accountId,
         'storageId': value.storageId,
-        'sellToken': NftOrderErc20TokenToJSON(value.sellToken),
-        'buyToken': NftOrderNftTokenToJSON(value.buyToken),
+        'sellToken': TokenAmountInfoToJSON(value.sellToken),
+        'buyToken': NftTokenAmountInfoToJSON(value.buyToken),
         'allOrNone': value.allOrNone,
         'fillAmountBOrS': value.fillAmountBOrS,
         'validUntil': value.validUntil,

@@ -6,6 +6,7 @@ import {
   CounterfactualWalletInfo,
   GetAccountRequest,
   GetCounterFactualInfoRequest,
+  GetNextStorageIdRequest,
   GetUserApiKeyRequest,
   UserApiKey,
 } from '../openapi';
@@ -54,6 +55,16 @@ export class AccountAPI {
     return this.api.getUserApiKey({
       ...requestParameters,
       xAPISIG: sig,
+    });
+  }
+
+  async getNextStorageId(
+    apiKey: string,
+    requestParameters: Omit<GetNextStorageIdRequest, 'xAPIKEY'>
+  ) {
+    return this.api.getNextStorageId({
+      ...requestParameters,
+      xAPIKEY: apiKey,
     });
   }
 }

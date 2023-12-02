@@ -1,7 +1,12 @@
+import { OffchainNFTFeeReqType } from '../constants';
 import {
   Configuration,
   FetchError,
   NftApi,
+  NftDataInfo,
+  NftDataInfoToJSON,
+  OffchainFeeInfo,
+  OffchainFeeInfoToJSON,
   UserNftBalancesInfo,
   UserNftBalancesInfoToJSON,
 } from '../openapi';
@@ -223,5 +228,265 @@ describe('getUserNftBalances', () => {
         method: 'GET',
       }
     );
+  });
+});
+
+describe('getNFTOffchainFee', () => {
+  afterEach(() => {
+    fetchApi.mockReset();
+  });
+
+  it('success', async () => {
+    const api = new AccountAPIMock();
+
+    const data: OffchainFeeInfo = {
+      gasPrice: '59677783480',
+      fees: [
+        {
+          token: 'ETH',
+          tokenId: 0,
+          fee: '41800000000000',
+          discount: 1,
+        },
+        {
+          token: 'LRC',
+          tokenId: 1,
+          fee: '397000000000000000',
+          discount: 1,
+        },
+        {
+          token: 'USDT',
+          tokenId: 3,
+          fee: '86300',
+          discount: 1,
+        },
+        {
+          token: 'DAI',
+          tokenId: 5,
+          fee: '86300000000000000',
+          discount: 1,
+        },
+        {
+          token: 'USDC',
+          tokenId: 6,
+          fee: '86300',
+          discount: 1,
+        },
+      ],
+    };
+
+    fetchApi.mockResolvedValueOnce(
+      new Response(JSON.stringify(OffchainFeeInfoToJSON(data)), {
+        status: 200,
+      })
+    );
+
+    await expect(
+      api.getNFTOffchainFee('someApiKey', {
+        accountId: 1234,
+        requestType: OffchainNFTFeeReqType.NFT_TRANSFER,
+      })
+    ).resolves.toEqual(data);
+
+    expect(fetchApi).toHaveBeenCalledTimes(1);
+    expect(fetchApi).toBeCalledWith(
+      'http://localhost/api/v3/user/nft/offchainFee?accountId=1234&requestType=11',
+      {
+        body: undefined,
+        credentials: undefined,
+        headers: {
+          'X-API-KEY': 'someApiKey',
+        },
+        method: 'GET',
+      }
+    );
+  });
+
+  it('not found', async () => {
+    const api = new AccountAPIMock();
+
+    const data = {
+      resultInfo: {
+        code: 104007,
+        message: 'Invalid accountId',
+      },
+    };
+
+    fetchApi.mockResolvedValueOnce(
+      new Response(JSON.stringify(data), { status: 400 })
+    );
+
+    await expect(
+      api.getNFTOffchainFee('someApiKey', {
+        accountId: 1234,
+        requestType: OffchainNFTFeeReqType.NFT_TRANSFER,
+        deployInWithdraw: true,
+        tokenAddress: '0x1234',
+      })
+    ).rejects.toThrowError();
+
+    expect(fetchApi).toHaveBeenCalledTimes(1);
+    expect(fetchApi).toBeCalledWith(
+      'http://localhost/api/v3/user/nft/offchainFee?accountId=1234&requestType=11&tokenAddress=0x1234&deployInWithdraw=true',
+      {
+        body: undefined,
+        credentials: undefined,
+        headers: {
+          'X-API-KEY': 'someApiKey',
+        },
+        method: 'GET',
+      }
+    );
+  });
+
+  it('internal error', async () => {
+    const api = new AccountAPIMock();
+
+    fetchApi.mockRejectedValueOnce(
+      new FetchError(new Error(), 'request failed')
+    );
+
+    await expect(
+      api.getNFTOffchainFee('someApiKey', {
+        accountId: 1234,
+        requestType: OffchainNFTFeeReqType.NFT_TRANSFER,
+      })
+    ).rejects.toThrowError();
+
+    expect(fetchApi).toHaveBeenCalledTimes(1);
+    expect(fetchApi).toBeCalledWith(
+      'http://localhost/api/v3/user/nft/offchainFee?accountId=1234&requestType=11',
+      {
+        body: undefined,
+        credentials: undefined,
+        headers: {
+          'X-API-KEY': 'someApiKey',
+        },
+        method: 'GET',
+      }
+    );
+  });
+
+  describe('getNftData', () => {
+    afterEach(() => {
+      fetchApi.mockReset();
+    });
+
+    it('success', async () => {
+      const api = new AccountAPIMock();
+
+      const data: NftDataInfo = {
+        nftData:
+          '0x0e9e600dab82794168edc773cc99efe580b4b928f20b5691d30b9b25a1bad01e',
+        minter: '0x83fcF5241eD5795b8f07C503C25B4c4481928348',
+        nftType: 'ERC1155',
+        tokenAddress: '0xced2e00488dbcafcb93849f44e9af474ae5b81cb',
+        nftId:
+          '0x0cd579aee8d306a1ca281c244ecd27309e5b388fbe60a044ed8a308ca4da426b',
+        royaltyPercentage: 10,
+        originalRoyaltyPercentage: 10,
+        status: true,
+        nftFactory: '0x97BE94250AEF1Df307749aFAeD27f9bc8aB911db',
+        nftOwner: '0x83fcF5241eD5795b8f07C503C25B4c4481928348',
+        nftBaseUri:
+          'ipfs://0x7d2865e615b9242689ad01f787df0d84de24944ea635d88b77ae54c710ab565e',
+        royaltyAddress: '0x83fcF5241eD5795b8f07C503C25B4c4481928348',
+        originalMinter: '0x83fcF5241eD5795b8f07C503C25B4c4481928348',
+        createdAt: 1700775842277,
+      };
+
+      fetchApi.mockResolvedValueOnce(
+        new Response(JSON.stringify(NftDataInfoToJSON(data)), {
+          status: 200,
+        })
+      );
+
+      await expect(
+        api.getNftData('someApiKey', {
+          minter: '0x1',
+          tokenAddress: '0x2',
+          nftId: '0x3',
+        })
+      ).resolves.toEqual(data);
+
+      expect(fetchApi).toHaveBeenCalledTimes(1);
+      expect(fetchApi).toBeCalledWith(
+        'http://localhost/api/v3/nft/info/nftData?minter=0x1&tokenAddress=0x2&nftId=0x3',
+        {
+          body: undefined,
+          credentials: undefined,
+          headers: {
+            'X-API-KEY': 'someApiKey',
+          },
+          method: 'GET',
+        }
+      );
+    });
+
+    it('not found', async () => {
+      const api = new AccountAPIMock();
+
+      const data = {
+        resultInfo: {
+          code: 108002,
+          message:
+            'ErrorException(ERR_NFT_METADATA_NOT_EXISTS: nft not exists)',
+        },
+      };
+
+      fetchApi.mockResolvedValueOnce(
+        new Response(JSON.stringify(data), { status: 400 })
+      );
+
+      await expect(
+        api.getNftData('someApiKey', {
+          minter: '0x1',
+          tokenAddress: '0x2',
+          nftId: '0x3',
+        })
+      ).rejects.toThrowError();
+
+      expect(fetchApi).toHaveBeenCalledTimes(1);
+      expect(fetchApi).toBeCalledWith(
+        'http://localhost/api/v3/nft/info/nftData?minter=0x1&tokenAddress=0x2&nftId=0x3',
+        {
+          body: undefined,
+          credentials: undefined,
+          headers: {
+            'X-API-KEY': 'someApiKey',
+          },
+          method: 'GET',
+        }
+      );
+    });
+
+    it('internal error', async () => {
+      const api = new AccountAPIMock();
+
+      fetchApi.mockRejectedValueOnce(
+        new FetchError(new Error(), 'request failed')
+      );
+
+      await expect(
+        api.getNftData('someApiKey', {
+          minter: '0x1',
+          tokenAddress: '0x2',
+          nftId: '0x3',
+        })
+      ).rejects.toThrowError();
+
+      expect(fetchApi).toHaveBeenCalledTimes(1);
+      expect(fetchApi).toBeCalledWith(
+        'http://localhost/api/v3/nft/info/nftData?minter=0x1&tokenAddress=0x2&nftId=0x3',
+        {
+          body: undefined,
+          credentials: undefined,
+          headers: {
+            'X-API-KEY': 'someApiKey',
+          },
+          method: 'GET',
+        }
+      );
+    });
   });
 });

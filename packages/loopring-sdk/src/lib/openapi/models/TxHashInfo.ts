@@ -25,7 +25,32 @@ export interface TxHashInfo {
      * @memberof TxHashInfo
      */
     hash?: string;
+    /**
+     * Whether the order was successfully submitted or not, please note, user may query after a while to get real process status, as most offchain requests are async processed
+     * @type {string}
+     * @memberof TxHashInfo
+     */
+    status?: TxHashInfoStatusEnum;
+    /**
+     * Idempotent of submit transfer response, submit same transfer again idempotent will be true
+     * @type {boolean}
+     * @memberof TxHashInfo
+     */
+    isIdempotent?: boolean;
 }
+
+
+/**
+ * @export
+ */
+export const TxHashInfoStatusEnum = {
+    Received: 'received',
+    Processing: 'processing',
+    Processed: 'processed',
+    Failed: 'failed'
+} as const;
+export type TxHashInfoStatusEnum = typeof TxHashInfoStatusEnum[keyof typeof TxHashInfoStatusEnum];
+
 
 /**
  * Check if a given object implements the TxHashInfo interface.
@@ -47,6 +72,8 @@ export function TxHashInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'hash': !exists(json, 'hash') ? undefined : json['hash'],
+        'status': !exists(json, 'status') ? undefined : json['status'],
+        'isIdempotent': !exists(json, 'isIdempotent') ? undefined : json['isIdempotent'],
     };
 }
 
@@ -60,6 +87,8 @@ export function TxHashInfoToJSON(value?: TxHashInfo | null): any {
     return {
         
         'hash': value.hash,
+        'status': value.status,
+        'isIdempotent': value.isIdempotent,
     };
 }
 

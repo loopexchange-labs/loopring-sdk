@@ -19,6 +19,43 @@ tags:
   - name: wallet
     description: Wallet APIs
 paths:
+  /api/v3/nft/transfer:
+    post:
+      operationId: transferNft
+      summary: Transfer NFT
+      description: transfer nft
+      tags:
+        - nft
+      parameters:
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-API-SIG
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferNftRequest'
+      responses:
+        '200':
+          description: Transfer NFT Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxHashInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
   /api/v3/counterFactualInfo:
     get:
       operationId: getCounterFactualInfo
@@ -70,6 +107,11 @@ paths:
           schema:
             type: string
           description: (Optional) the NFT tokenAddress, needed when requestType is 9 or 10
+        - in: query
+          name: deployInWithdraw
+          schema:
+            type: boolean
+          description: (Optional) Deploy the counterFactual NFT token when withdraw, if the contract not deployed and you want to deploy it when withdraw, need set to true to get the withdrawal fee
         - in: header
           name: X-API-KEY
           schema:
@@ -133,7 +175,7 @@ paths:
                 $ref: '#/components/schemas/ResultInfo'
   /api/v3/nft/mint:
     post:
-      operationId: submitNFTMint
+      operationId: mintNft
       summary: Mint NFT
       description: mint nft in Loopring layer2, only can mint ERC1155 in layer2 now.
       tags:
@@ -420,6 +462,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResultInfo'
+  /api/v3/nft/info/nftData:
+    get:
+      operationId: getNftData
+      summary: Query nftDatas by minter, tokenAddress and nftID.
+      tags:
+        - nft
+      parameters:
+        - in: header
+          name: X-API-KEY
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: minter
+          schema:
+            type: string
+          description: The minter's address.
+          required: true
+        - in: query
+          name: tokenAddress
+          schema:
+            type: string
+          description: The NFT token's address
+          required: true
+        - in: query
+          name: nftId
+          schema:
+            type: string
+          description: The NFT Id of the NFT token
+          required: true
+      responses:
+        '200':
+          description: Returns the NFT data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NftDataInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultInfo'
 components:
   schemas:
     ResultInfo:
@@ -438,7 +523,7 @@ components:
       type: object
       properties:
         tokenId:
-          type: string
+          type: integer
           description: The Loopring's ERC20 token identifier.
         amount:
           type: string
@@ -452,6 +537,9 @@ components:
         token:
           type: string
           description: fee token
+        tokenId:
+          type: integer
+          description: tokenId
         fee:
           type: string
           description: fee amount
@@ -516,6 +604,69 @@ components:
         hash:
           type: string
           description: The hash identifier set by the user at the time of submission, can use this hash to get the transfer info
+        status:
+          type: string
+          description: Whether the order was successfully submitted or not, please note, user may query after a while to get real process status, as most offchain requests are async processed
+          enum:
+            - received
+            - processing
+            - processed
+            - failed
+        isIdempotent:
+          type: boolean
+          description: Idempotent of submit transfer response, submit same transfer again idempotent will be true
+    TransferNftRequest:
+      type: object
+      properties:
+        exchange:
+          type: string
+          description: Exchange address
+        fromAddress:
+          type: string
+          description: Sender address
+        fromAccountId:
+          type: integer
+          description: Sender accountId
+        toAddress:
+          type: string
+          description: Receiver address
+        toAccountId:
+          type: integer
+          description: Receiver accountId, can set to 0 if dont have one
+        token:
+          $ref: '#/components/schemas/NftTokenAmountInfo'
+          description: nft token
+        maxFee:
+          $ref: '#/components/schemas/TokenAmountInfo'
+        storageId:
+          type: integer
+          description: the offchain id
+        validUntil:
+          type: integer
+          format: int64
+          description: Timestamp for transfer to become invalid, seconds, normally current time + 2 months
+        eddsaSignature:
+          type: string
+          description: eddsa signature of the eddsa hash
+        memo:
+          type: string
+          description: (Optional) memo
+        payPayeeUpdateAccount:
+          type: boolean
+          description: (Optional) payPayeeUpdateAccount
+        counterFactualInfo:
+          $ref: '#/components/schemas/CounterfactualWalletInfo'
+          description: (Optional) counterFactualInfo, if it's counterFactual wallet, need pass the info
+      required:
+        - exchange
+        - fromAddress
+        - fromAccountId
+        - toAddress
+        - toAccountId
+        - token
+        - maxFee
+        - storageId
+        - validUntil
     NFTMintRequestV3:
       type: object
       properties:
@@ -592,6 +743,61 @@ components:
       required:
         - totalNum
         - data
+    NftDataInfo:
+      type: object
+      properties:
+        nftData:
+          type: string
+          description: nftData
+        minter:
+          type: string
+          description: minter
+        nftType:
+          type: string
+          enum: [ERC1155, ERC721]
+          description: nftType
+        tokenAddress:
+          type: string
+          description: tokenAddress
+        nftId:
+          type: string
+          description: nftId
+        royaltyPercentage:
+          type: integer
+          description: royaltyPercentage
+        status:
+          type: boolean
+          description: status
+        nftFactory:
+          type: string
+          description: nftFactory
+        nftOwner:
+          type: string
+          description: nftOwner
+        nftBaseUri:
+          type: string
+          description: nftBaseUri
+        royaltyAddress:
+          type: string
+          description: royaltyAddress
+        originalMinter:
+          type: string
+          description: originalMinter
+        originalRoyaltyPercentage:
+          type: integer
+          description: royaltyPercentage
+        createdAt:
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds
+          example: 1669188281228
+      required:
+        - nftData
+        - minter
+        - nftType
+        - tokenAddress
+        - nftId
+        - royaltyPercentage
     PendingBalance:
       type: object
       properties:
@@ -1018,7 +1224,7 @@ components:
       required:
         - accountId
         - hash
-    NftOrderNftToken:
+    NftTokenAmountInfo:
       type: object
       properties:
         tokenId:
@@ -1030,18 +1236,6 @@ components:
         amount:
           type: string
           description: the amount of the NFT token
-      required:
-        - tokenId
-        - amount
-    NftOrderErc20Token:
-      type: object
-      properties:
-        tokenId:
-          type: integer
-          description: the Loopring's erc20 token identifier
-        amount:
-          type: string
-          description: the amount of the erc20 token
       required:
         - tokenId
         - amount
@@ -1058,10 +1252,10 @@ components:
           type: integer
           description: storageId
         sellToken:
-          $ref: '#/components/schemas/NftOrderNftToken'
+          $ref: '#/components/schemas/NftTokenAmountInfo'
           description: nft token
         buyToken:
-          $ref: '#/components/schemas/NftOrderErc20Token'
+          $ref: '#/components/schemas/TokenAmountInfo'
           description: erc20 token
         allOrNone:
           type: boolean
@@ -1106,10 +1300,10 @@ components:
           type: integer
           description: storageId
         sellToken:
-          $ref: '#/components/schemas/NftOrderErc20Token'
+          $ref: '#/components/schemas/TokenAmountInfo'
           description: erc20 token
         buyToken:
-          $ref: '#/components/schemas/NftOrderNftToken'
+          $ref: '#/components/schemas/NftTokenAmountInfo'
           description: nft token
         allOrNone:
           type: boolean

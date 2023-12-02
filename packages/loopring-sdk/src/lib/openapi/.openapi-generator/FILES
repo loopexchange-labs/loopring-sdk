@@ -21,10 +21,10 @@ models/MetadataExtra.ts
 models/MetadataImageSize.ts
 models/NFTMintRequestV3.ts
 models/NextStorageIdInfo.ts
+models/NftDataInfo.ts
 models/NftMakerOrder.ts
-models/NftOrderErc20Token.ts
-models/NftOrderNftToken.ts
 models/NftTakerOrder.ts
+models/NftTokenAmountInfo.ts
 models/NftTradeFill.ts
 models/OffchainFeeInfo.ts
 models/PendingBalance.ts
@@ -38,6 +38,7 @@ models/TokenAmountInfo.ts
 models/TokenFeeInfo.ts
 models/TradeNftRequest.ts
 models/TradeNftResponse.ts
+models/TransferNftRequest.ts
 models/TxHashInfo.ts
 models/UnlockAssetRequest.ts
 models/UserApiKey.ts

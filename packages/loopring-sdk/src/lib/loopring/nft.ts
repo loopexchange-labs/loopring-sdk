@@ -1,4 +1,10 @@
-import { Configuration, GetUserNftBalancesRequest, NftApi } from '../openapi';
+import {
+  Configuration,
+  GetNFTOffchainFeeRequest,
+  GetNftDataRequest,
+  GetUserNftBalancesRequest,
+  NftApi,
+} from '../openapi';
 
 export class NftAPI {
   // private baseUrl: string;
@@ -18,6 +24,26 @@ export class NftAPI {
     requestParameters: Omit<GetUserNftBalancesRequest, 'xAPIKEY'>
   ) {
     return this.api.getUserNftBalances({
+      ...requestParameters,
+      xAPIKEY: apiKey,
+    });
+  }
+
+  async getNFTOffchainFee(
+    apiKey: string,
+    requestParameters: Omit<GetNFTOffchainFeeRequest, 'xAPIKEY'>
+  ) {
+    return this.api.getNFTOffchainFee({
+      ...requestParameters,
+      xAPIKEY: apiKey,
+    });
+  }
+
+  async getNftData(
+    apiKey: string,
+    requestParameters: Omit<GetNftDataRequest, 'xAPIKEY'>
+  ) {
+    return this.api.getNftData({
       ...requestParameters,
       xAPIKEY: apiKey,
     });

@@ -26,6 +26,12 @@ export interface TokenFeeInfo {
      */
     token: string;
     /**
+     * tokenId
+     * @type {number}
+     * @memberof TokenFeeInfo
+     */
+    tokenId?: number;
+    /**
      * fee amount
      * @type {string}
      * @memberof TokenFeeInfo
@@ -61,6 +67,7 @@ export function TokenFeeInfoFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'token': json['token'],
+        'tokenId': !exists(json, 'tokenId') ? undefined : json['tokenId'],
         'fee': json['fee'],
         'discount': !exists(json, 'discount') ? undefined : json['discount'],
     };
@@ -76,6 +83,7 @@ export function TokenFeeInfoToJSON(value?: TokenFeeInfo | null): any {
     return {
         
         'token': value.token,
+        'tokenId': value.tokenId,
         'fee': value.fee,
         'discount': value.discount,
     };

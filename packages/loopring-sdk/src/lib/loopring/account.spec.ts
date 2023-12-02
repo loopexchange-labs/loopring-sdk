@@ -4,6 +4,8 @@ import {
   Configuration,
   CounterfactualWalletInfo,
   FetchError,
+  NextStorageIdInfo,
+  NextStorageIdInfoToJSON,
   UserApiKey,
 } from '../openapi';
 import { AccountAPI } from './account';
@@ -291,6 +293,101 @@ describe('getUserApiKey', () => {
         headers: {
           'X-API-SIG':
             '0x21492035857e8d7eda20504b18bcfa510be62ba485fbe3df8505473d2d3a5ee019fe53d2d64d638b31fbcadcf7117da0a7dc4ebccadd963e8cec104aaef085090518edd02c02b6969f71df6f87c6e2e35259b7cf36c3b4823b3bed794de546bd',
+        },
+        method: 'GET',
+      }
+    );
+  });
+});
+
+describe('getNextStorageId', () => {
+  afterEach(() => {
+    fetchApi.mockReset();
+  });
+
+  it('success', async () => {
+    const api = new AccountAPIMock();
+
+    const data: NextStorageIdInfo = {
+      orderId: 0,
+      offchainId: 1,
+    };
+
+    fetchApi.mockResolvedValueOnce(
+      new Response(JSON.stringify(NextStorageIdInfoToJSON(data)), {
+        status: 200,
+      })
+    );
+
+    await expect(
+      api.getNextStorageId('someApiKey', { accountId: 1234, sellTokenId: 5678 })
+    ).resolves.toEqual(data);
+
+    expect(fetchApi).toHaveBeenCalledTimes(1);
+    expect(fetchApi).toBeCalledWith(
+      'http://localhost/api/v3/storageId?accountId=1234&sellTokenId=5678',
+      {
+        body: undefined,
+        credentials: undefined,
+        headers: {
+          'X-API-KEY': 'someApiKey',
+        },
+        method: 'GET',
+      }
+    );
+  });
+
+  it('not found', async () => {
+    const api = new AccountAPIMock();
+
+    const data = {
+      resultInfo: {
+        code: 104007,
+        message: 'Invalid accountId',
+      },
+    };
+
+    fetchApi.mockResolvedValueOnce(
+      new Response(JSON.stringify(data), { status: 400 })
+    );
+
+    await expect(
+      api.getNextStorageId('someApiKey', { accountId: 1234, sellTokenId: 5678 })
+    ).rejects.toThrowError();
+
+    expect(fetchApi).toHaveBeenCalledTimes(1);
+    expect(fetchApi).toBeCalledWith(
+      'http://localhost/api/v3/storageId?accountId=1234&sellTokenId=5678',
+      {
+        body: undefined,
+        credentials: undefined,
+        headers: {
+          'X-API-KEY': 'someApiKey',
+        },
+        method: 'GET',
+      }
+    );
+  });
+
+  it('internal error', async () => {
+    const api = new AccountAPIMock();
+
+    fetchApi.mockRejectedValueOnce(
+      new FetchError(new Error(), 'request failed')
+    );
+
+    await expect(
+      api.getNextStorageId('someApiKey', { accountId: 1234, sellTokenId: 5678 })
+    ).rejects.toThrowError();
+
+    expect(fetchApi).toHaveBeenCalledTimes(1);
+    expect(fetchApi).toBeCalledWith(
+      'http://localhost/api/v3/storageId?accountId=1234&sellTokenId=5678',
+      {
+        body: undefined,
+        credentials: undefined,
+        headers: {
+          'X-API-KEY': 'someApiKey',
         },
         method: 'GET',
       }

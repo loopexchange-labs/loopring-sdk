@@ -27,3 +27,14 @@ export const getBaseUrlByChainId = (id: ChainId) => {
 
   return 'https://uat2.loopring.io';
 };
+
+export enum OffchainNFTFeeReqType {
+  NFT_MINT = 9,
+  NFT_WITHDRAWAL = 10,
+  NFT_TRANSFER = 11,
+  NFT_DEPLOY = 13,
+  NFT_TRANSFER_AND_UPDATE_ACCOUNT = 19,
+  EXTRA_TYPES = 24,
+}
+
+export const IPFS_URL = 'https://ipfs.loopring.io/ipfs/';
