@@ -24,13 +24,7 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "packages/loopring-sdk/**/*.ts",
-          "packages/loopring-sdk/package.json"
-        ]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "tsc": {
       "executor": "nx:run-commands",

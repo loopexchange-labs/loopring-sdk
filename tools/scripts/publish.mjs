@@ -57,4 +57,5 @@ try {
 }
 
 // Execute "npm publish" to publish
-execSync(`npm publish --access public --provenance --tag ${tag}`);
+execSync(`npm publish --tag ${tag}`);
+// execSync(`npm publish --access public --provenance --tag ${tag}`);
